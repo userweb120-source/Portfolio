@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BRD Preview</title>
+
+    <script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            background: #f3f3f3;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        #document {
+            max-width: 900px;
+            margin: 30px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Business Requirements Document</h1>
+    </header>
+
+    <div id="document"></div>
+
+    <script>
+        fetch("./documents/BRD.docx")
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                docx.renderAsync(
+                    data,
+                    document.getElementById("document")
+                );
+            })
+            .catch(error => {
+                console.error(error);
+
+                document.getElementById("document").innerHTML =
+                    "<h2>Unable to load the document.</h2>";
+            });
+    </script>
+
+</body>
+</html>
