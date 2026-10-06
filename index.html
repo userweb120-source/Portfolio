@@ -10,7 +10,19 @@
 
     <title>Word Document Preview</title>
 
-    <!-- DOCX Preview Library -->
+
+    <!-- =========================================
+         JSZip
+         Required by docx-preview
+    ========================================== -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+
+    <!-- =========================================
+         DOCX Preview
+    ========================================== -->
+
     <script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
 
 
@@ -23,27 +35,38 @@
 
         body {
             margin: 0;
-            background: #f2f2f2;
-            font-family: Arial, Helvetica, sans-serif;
+
+            background: #f1f3f5;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
             color: #222;
         }
 
 
-        /* =========================
+        /* ==============================
            HEADER
-        ========================= */
+        ============================== */
 
         .header {
-            background: #ffffff;
+
+            background: white;
+
             border-bottom: 1px solid #ddd;
 
             padding: 20px 40px;
 
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
 
             position: sticky;
+
             top: 0;
 
             z-index: 1000;
@@ -51,8 +74,11 @@
 
 
         .title {
+
             margin: 0;
+
             font-size: 24px;
+
         }
 
 
@@ -74,13 +100,15 @@
 
 
         .download-button:hover {
+
             background: #444;
+
         }
 
 
-        /* =========================
-           DOCUMENT AREA
-        ========================= */
+        /* ==============================
+           DOCUMENT
+        ============================== */
 
         .document-wrapper {
 
@@ -95,14 +123,14 @@
 
             max-width: 900px;
 
-            margin: 0 auto;
+            margin: auto;
 
         }
 
 
-        /* =========================
+        /* ==============================
            LOADING
-        ========================= */
+        ============================== */
 
         .loading {
 
@@ -114,19 +142,22 @@
 
             border-radius: 8px;
 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.08);
 
         }
 
 
         .loading h2 {
+
             margin-top: 0;
+
         }
 
 
-        /* =========================
+        /* ==============================
            ERROR
-        ========================= */
+        ============================== */
 
         .error {
 
@@ -136,7 +167,8 @@
 
             border-radius: 8px;
 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.08);
 
         }
 
@@ -154,9 +186,9 @@
 
             padding: 15px;
 
-            overflow-x: auto;
-
             border-radius: 5px;
+
+            overflow-x: auto;
 
             white-space: pre-wrap;
 
@@ -165,9 +197,9 @@
         }
 
 
-        /* =========================
+        /* ==============================
            MOBILE
-        ========================= */
+        ============================== */
 
         @media (max-width: 600px) {
 
@@ -204,13 +236,12 @@
 </head>
 
 
-
 <body>
 
 
-    <!-- =========================
+    <!-- =========================================
          HEADER
-    ========================= -->
+    ========================================== -->
 
     <header class="header">
 
@@ -230,10 +261,9 @@
     </header>
 
 
-
-    <!-- =========================
-         DOCUMENT
-    ========================= -->
+    <!-- =========================================
+         DOCUMENT AREA
+    ========================================== -->
 
     <main class="document-wrapper">
 
@@ -246,7 +276,8 @@
                 </h2>
 
                 <p>
-                    Please wait while the Word document is being loaded.
+                    Please wait while the Word document
+                    is being loaded.
                 </p>
 
             </div>
@@ -256,30 +287,11 @@
     </main>
 
 
-
-    <!-- =========================
+    <!-- =========================================
          JAVASCRIPT
-    ========================= -->
+    ========================================== -->
 
     <script>
-
-
-        /*
-         * ==========================================
-         * WORD DOCUMENT LOCATION
-         * ==========================================
-         *
-         * Your GitHub structure should be:
-         *
-         * Portfolio
-         * |
-         * |-- index.html
-         * |
-         * |-- documents
-         *     |
-         *     |-- Word Document.docx
-         *
-         */
 
 
         const documentContainer =
@@ -290,30 +302,23 @@
             "./documents/Word%20Document.docx";
 
 
+        /* =========================================
+           CHECK JSZip
+        ========================================== */
 
-        /*
-         * ==========================================
-         * CHECK DOCX LIBRARY
-         * ==========================================
-         */
-
-        if (typeof docx === "undefined") {
+        if (typeof JSZip === "undefined") {
 
             documentContainer.innerHTML = `
 
                 <div class="error">
 
                     <h2>
-                        DOCX Viewer Library Error
+                        JSZip could not be loaded
                     </h2>
 
                     <p>
-                        The DOCX preview library could not be loaded.
-                    </p>
-
-                    <p>
-                        Please check your internet connection
-                        and GitHub Pages.
+                        The required JSZip library
+                        is not available.
                     </p>
 
                 </div>
@@ -322,14 +327,39 @@
 
         }
 
+
+        /* =========================================
+           CHECK DOCX PREVIEW
+        ========================================== */
+
+        else if (typeof docx === "undefined") {
+
+            documentContainer.innerHTML = `
+
+                <div class="error">
+
+                    <h2>
+                        DOCX Preview Library Error
+                    </h2>
+
+                    <p>
+                        The DOCX preview library
+                        could not be loaded.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+        /* =========================================
+           LOAD DOCUMENT
+        ========================================== */
+
         else {
 
-
-            /*
-             * ==========================================
-             * LOAD WORD FILE
-             * ==========================================
-             */
 
             fetch(wordFile)
 
@@ -337,23 +367,20 @@
                 .then(function(response) {
 
 
-                    /*
-                     * Check HTTP response
-                     */
-
                     if (!response.ok) {
 
                         throw new Error(
-                            "Could not load the Word document. HTTP Status: "
-                            + response.status
+
+                            "Could not load Word document. " +
+
+                            "HTTP Status: " +
+
+                            response.status
+
                         );
 
                     }
 
-
-                    /*
-                     * Convert file to ArrayBuffer
-                     */
 
                     return response.arrayBuffer();
 
@@ -363,12 +390,8 @@
                 .then(function(arrayBuffer) {
 
 
-                    /*
-                     * Check file size
-                     */
-
                     console.log(
-                        "Word file loaded successfully."
+                        "Word document loaded."
                     );
 
 
@@ -379,7 +402,9 @@
                     );
 
 
-                    if (arrayBuffer.byteLength === 0) {
+                    if (
+                        arrayBuffer.byteLength === 0
+                    ) {
 
                         throw new Error(
                             "The Word document is empty."
@@ -389,16 +414,14 @@
 
 
                     /*
-                     * Remove loading message
+                     * Clear loading message
                      */
 
                     documentContainer.innerHTML = "";
 
 
                     /*
-                     * ==========================================
-                     * RENDER WORD DOCUMENT
-                     * ==========================================
+                     * Render DOCX
                      */
 
                     return docx.renderAsync(
@@ -421,7 +444,8 @@
 
                             breakPages: true,
 
-                            ignoreLastRenderedPageBreak: false,
+                            ignoreLastRenderedPageBreak:
+                                false,
 
                             experimental: false
 
@@ -435,10 +459,6 @@
                 .then(function() {
 
 
-                    /*
-                     * SUCCESS
-                     */
-
                     console.log(
                         "Word document rendered successfully."
                     );
@@ -448,10 +468,6 @@
 
                 .catch(function(error) {
 
-
-                    /*
-                     * ERROR
-                     */
 
                     console.error(
                         "DOCX ERROR:",
@@ -464,38 +480,40 @@
                         <div class="error">
 
                             <h2>
-                                Unable to display the Word document
+                                Unable to display
+                                the Word document
                             </h2>
 
 
                             <p>
-                                The Word file was found, but
-                                the browser could not render it.
+                                The Word file was found,
+                                but the browser could not
+                                render it.
                             </p>
 
 
                             <p>
-                                <strong>Error message:</strong>
-                            </p>
-
-
-                            <pre>${error.message}</pre>
-
-
-                            <p>
-                                <strong>File path:</strong>
+                                <strong>
+                                    Error:
+                                </strong>
                             </p>
 
 
                             <pre>
-./documents/Word%20Document.docx
+${error.message}
                             </pre>
 
 
                             <p>
-                                Check the browser Console
-                                for more details.
+                                <strong>
+                                    File:
+                                </strong>
                             </p>
+
+
+                            <pre>
+documents/Word Document.docx
+                            </pre>
 
                         </div>
 
@@ -504,7 +522,6 @@
                 });
 
         }
-
 
     </script>
 
