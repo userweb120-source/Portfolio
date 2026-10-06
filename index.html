@@ -4,58 +4,270 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BRD Preview</title>
+    <title>Word Document Preview</title>
 
+    <!-- DOCX Preview Library -->
     <script src="https://unpkg.com/docx-preview@0.3.6/dist/docx-preview.min.js"></script>
 
     <style>
-        body {
-            margin: 0;
-            background: #f3f3f3;
-            font-family: Arial, sans-serif;
+
+        * {
+            box-sizing: border-box;
         }
 
-        header {
+        body {
+            margin: 0;
+            background: #f1f3f5;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #222;
+        }
+
+        /* Header */
+        .header {
             background: white;
             padding: 20px 40px;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header h1 {
+        .header h1 {
             margin: 0;
+            font-size: 24px;
+        }
+
+        .download-btn {
+            text-decoration: none;
+            background: #222;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .download-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Document Area */
+        .document-wrapper {
+            padding: 40px 20px;
         }
 
         #document {
             max-width: 900px;
-            margin: 30px auto;
+            margin: 0 auto;
         }
+
+        /* Loading */
+        .loading {
+            background: white;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        /* Error */
+        .error {
+            background: white;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .error h2 {
+            margin-top: 0;
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .document-wrapper {
+                padding: 20px 10px;
+            }
+
+        }
+
     </style>
 </head>
 
+
 <body>
 
-    <header>
-        <h1>Business Requirements Document</h1>
-    </header>
+    <!-- Header -->
+    <div class="header">
 
-    <div id="document"></div>
+        <h1>Word Document Preview</h1>
 
+        <a
+            class="download-btn"
+            href="./documents/Word%20Document.docx"
+            download
+        >
+            Download Word File
+        </a>
+
+    </div>
+
+
+    <!-- Document -->
+    <div class="document-wrapper">
+
+        <div id="document">
+
+            <div class="loading">
+                <h2>Loading document...</h2>
+                <p>Please wait.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript -->
     <script>
-        fetch("./documents/BRD.docx")
-            .then(response => response.arrayBuffer())
-            .then(data => {
+
+        const documentContainer =
+            document.getElementById("document");
+
+
+        /*
+         * Load the Word document
+         *
+         * File location:
+         * documents/Word Document.docx
+         */
+
+        fetch("./documents/Word%20Document.docx")
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Word document could not be found. HTTP Status: "
+                        + response.status
+                    );
+
+                }
+
+                return response.arrayBuffer();
+
+            })
+
+            .then(function(data) {
+
+                /*
+                 * Clear loading message
+                 */
+
+                documentContainer.innerHTML = "";
+
+
+                /*
+                 * Render DOCX document
+                 */
+
                 docx.renderAsync(
                     data,
-                    document.getElementById("document")
-                );
+                    documentContainer,
+                    null,
+                    {
+                        className: "docx",
+                        inWrapper: true,
+                        ignoreWidth: false,
+                        ignoreHeight: false,
+                        breakPages: true,
+                        ignoreLastRenderedPageBreak: false,
+                        experimental: false
+                    }
+                )
+
+                .then(function() {
+
+                    console.log(
+                        "Word document loaded successfully."
+                    );
+
+                })
+
+                .catch(function(error) {
+
+                    console.error(error);
+
+                    documentContainer.innerHTML = `
+
+                        <div class="error">
+
+                            <h2>
+                                Unable to display the Word document
+                            </h2>
+
+                            <p>
+                                The document was found, but
+                                it could not be rendered.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                });
+
             })
-            .catch(error => {
+
+            .catch(function(error) {
+
                 console.error(error);
 
-                document.getElementById("document").innerHTML =
-                    "<h2>Unable to load the document.</h2>";
+                documentContainer.innerHTML = `
+
+                    <div class="error">
+
+                        <h2>
+                            Document Not Found
+                        </h2>
+
+                        <p>
+                            Make sure the file exists at:
+                        </p>
+
+                        <strong>
+                            documents/Word Document.docx
+                        </strong>
+
+                        <br><br>
+
+                        <p>
+                            Error:
+                            ${error.message}
+                        </p>
+
+                    </div>
+
+                `;
+
             });
+
     </script>
 
 </body>
+
 </html>
